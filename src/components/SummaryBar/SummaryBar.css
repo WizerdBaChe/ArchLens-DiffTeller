@@ -1,0 +1,33 @@
+.al-summary-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.al-summary-bar__item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.al-summary-bar__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  transform: translateY(-1px);
+}
+
+.al-summary-bar__count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--line);
+}
+
+.al-summary-bar__label {
+  font-size: 12px;
+  color: var(--line-dim);
+}

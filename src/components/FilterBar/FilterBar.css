@@ -1,0 +1,26 @@
+.al-filter-bar {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.al-filter-chip {
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--line-dim);
+  font-size: 12px;
+  font-family: var(--font-body);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 32px;
+  transition: border-color 120ms ease-out, color 120ms ease-out;
+}
+
+.al-filter-chip:hover {
+  color: var(--line);
+}
+
+.al-filter-chip--on {
+  background: rgba(220, 238, 245, 0.06);
+}

@@ -1,0 +1,86 @@
+:root {
+  /* ---- Color: blueprint drafting palette ---- */
+  --paper: #0f2e42; /* ground — real blueprint paper, not near-black */
+  --paper-raised: #143a52; /* panels sit one shade up from the ground */
+  --paper-sunken: #0a2233; /* recessed wells (input areas, scrollbars) */
+  --line: #dceef5; /* chalk-white linework / primary text */
+  --line-dim: rgba(220, 238, 245, 0.62); /* secondary text */
+  --line-faint: rgba(220, 238, 245, 0.32); /* tertiary text, placeholders */
+  --grid: rgba(220, 238, 245, 0.07); /* graph-paper texture */
+  --rule: rgba(220, 238, 245, 0.16); /* hairline dividers */
+
+  --added: #5fd38a; /* drafting green */
+  --added-dim: rgba(95, 211, 138, 0.16);
+  --removed: #ff6b4a; /* rust / red-pencil */
+  --removed-dim: rgba(255, 107, 74, 0.16);
+  --moved: #f2b84b; /* ochre */
+  --moved-dim: rgba(242, 184, 75, 0.16);
+  --renamed: #c792ea; /* correction-pen violet */
+  --renamed-dim: rgba(199, 146, 234, 0.16);
+  --meta: #6fb8d6; /* steel-blue, distinct from renamed/moved */
+  --meta-dim: rgba(111, 184, 214, 0.16);
+  --unchanged: rgba(220, 238, 245, 0.4);
+
+  --focus-ring: #f2b84b;
+
+  /* ---- Type ---- */
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  /* ---- Scale ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 3px;
+  --radius-md: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--line);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

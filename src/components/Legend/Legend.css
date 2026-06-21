@@ -1,0 +1,18 @@
+.al-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--line-dim);
+}
+
+.al-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.al-legend__item--note {
+  color: var(--line-faint);
+  font-style: italic;
+}

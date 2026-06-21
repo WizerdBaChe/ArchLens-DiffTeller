@@ -1,0 +1,47 @@
+.al-tree-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.al-tree-view__headers {
+  display: flex;
+  padding: var(--space-2) var(--space-6) var(--space-2);
+  border-bottom: 1px solid var(--rule);
+}
+
+.al-tree-view__header {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--line-faint);
+}
+
+.al-tree-view__header--lane {
+  flex: 0 0 120px;
+}
+
+.al-tree-view__scroll {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-3) 0;
+}
+
+.al-tree-view__flex {
+  display: flex;
+  align-items: stretch;
+  padding: 0 var(--space-6);
+}
+
+.al-tree-view__col {
+  flex: 1;
+  min-width: 0;
+}
+
+.al-tree-view__lane {
+  position: relative;
+  flex: 0 0 auto;
+}
