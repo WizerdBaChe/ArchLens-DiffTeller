@@ -44,16 +44,33 @@
 .al-tree-row__name {
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .al-tree-row__glyph {
   font-weight: 700;
   font-size: 12px;
   margin-left: 2px;
+  flex-shrink: 0;
 }
 
 .al-tree-row__confidence {
   font-size: 11px;
   color: var(--line-faint);
   margin-left: 2px;
+  flex-shrink: 0;
+}
+
+/* Leader-line extension (P-fix): fills the gap between the end of a row's
+   visible content and the row's edge, so the connector dot in the lane
+   reads as "attached to this filename" instead of floating in empty space. */
+.al-tree-row__stub {
+  flex: 1 1 16px;
+  min-width: 12px;
+  height: 0;
+  align-self: center;
+  border-bottom: 1.5px dashed transparent;
+  opacity: 0.55;
+  margin: 0 4px 0 6px;
 }

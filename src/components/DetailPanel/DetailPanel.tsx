@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { DiffChange } from "@/types/tree";
 import { CHANGE_TYPE_META } from "../changeTypeMeta";
 import "./DetailPanel.css";
@@ -8,57 +9,78 @@ interface DetailPanelProps {
 }
 
 export function DetailPanel({ change, onClose }: DetailPanelProps) {
-  if (!change) {
-    return (
-      <aside className="al-detail-panel al-detail-panel--empty">
-        <p>Select a node in either tree to see why it was classified the way it was.</p>
-      </aside>
-    );
-  }
+  // Keep rendering the last-selected change while the drawer animates shut,
+  // so it doesn't flash to an empty state mid-transition.
+  const [displayed, setDisplayed] = useState<DiffChange | null>(change);
+  const isOpen = change !== null;
 
-  const meta = CHANGE_TYPE_META[change.type];
+  useEffect(() => {
+    if (change) setDisplayed(change);
+  }, [change]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
+  const meta = displayed ? CHANGE_TYPE_META[displayed.type] : null;
 
   return (
-    <aside className="al-detail-panel" aria-live="polite">
-      <div className="al-detail-panel__head">
-        <span className="al-detail-panel__type" style={{ color: `var(${meta.colorVar})` }}>
-          {meta.label}
-        </span>
-        <button type="button" className="al-detail-panel__close" onClick={onClose} aria-label="Close detail panel">
-          ×
-        </button>
-      </div>
+    <>
+      {isOpen && <div className="al-detail-backdrop" onClick={onClose} aria-hidden="true" />}
+      <aside
+        className={`al-detail-panel ${isOpen ? "al-detail-panel--open" : ""}`}
+        aria-live="polite"
+        aria-hidden={!isOpen}
+      >
+        {displayed && meta && (
+          <>
+            <div className="al-detail-panel__head">
+              <span className="al-detail-panel__type" style={{ color: `var(${meta.colorVar})` }}>
+                {meta.label}
+              </span>
+              <button type="button" className="al-detail-panel__close" onClick={onClose} aria-label="Close detail panel">
+                ×
+              </button>
+            </div>
 
-      {change.from && (
-        <div className="al-detail-panel__row">
-          <span className="al-detail-panel__label">From</span>
-          <code className="al-detail-panel__path">{change.from}</code>
-        </div>
-      )}
-      {change.to && (
-        <div className="al-detail-panel__row">
-          <span className="al-detail-panel__label">To</span>
-          <code className="al-detail-panel__path">{change.to}</code>
-        </div>
-      )}
-      <div className="al-detail-panel__row">
-        <span className="al-detail-panel__label">Kind</span>
-        <span>{change.kind}</span>
-      </div>
-      <div className="al-detail-panel__row">
-        <span className="al-detail-panel__label">Confidence</span>
-        <span className="al-detail-panel__confidence-bar">
-          <span
-            className="al-detail-panel__confidence-fill"
-            style={{ width: `${change.confidence * 100}%`, background: `var(${meta.colorVar})` }}
-          />
-        </span>
-        <span>{Math.round(change.confidence * 100)}%</span>
-      </div>
-      <div className="al-detail-panel__reason">
-        <span className="al-detail-panel__label">Why</span>
-        <p>{change.reason}</p>
-      </div>
-    </aside>
+            {displayed.from && (
+              <div className="al-detail-panel__row">
+                <span className="al-detail-panel__label">From</span>
+                <code className="al-detail-panel__path">{displayed.from}</code>
+              </div>
+            )}
+            {displayed.to && (
+              <div className="al-detail-panel__row">
+                <span className="al-detail-panel__label">To</span>
+                <code className="al-detail-panel__path">{displayed.to}</code>
+              </div>
+            )}
+            <div className="al-detail-panel__row">
+              <span className="al-detail-panel__label">Kind</span>
+              <span>{displayed.kind}</span>
+            </div>
+            <div className="al-detail-panel__row">
+              <span className="al-detail-panel__label">Confidence</span>
+              <span className="al-detail-panel__confidence-bar">
+                <span
+                  className="al-detail-panel__confidence-fill"
+                  style={{ width: `${displayed.confidence * 100}%`, background: `var(${meta.colorVar})` }}
+                />
+              </span>
+              <span>{Math.round(displayed.confidence * 100)}%</span>
+            </div>
+            <div className="al-detail-panel__reason">
+              <span className="al-detail-panel__label">Why</span>
+              <p>{displayed.reason}</p>
+            </div>
+          </>
+        )}
+      </aside>
+    </>
   );
 }

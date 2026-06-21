@@ -39,6 +39,31 @@
   color: var(--line-faint);
 }
 
+/* ---- P1: each functional block is its own card, separated by visible gaps
+   of plain page background, with a numbered eyebrow establishing reading
+   order (this genuinely is a sequence: set up -> review -> inspect). ---- */
+.al-app__section {
+  padding: var(--space-4) var(--space-6) 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.al-app__section--fill {
+  flex: 1;
+  padding-bottom: var(--space-4);
+}
+
+.al-section-eyebrow {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--line-faint);
+  margin-bottom: var(--space-2);
+}
+
 .al-app__empty {
   flex: 1;
   display: flex;
@@ -46,10 +71,17 @@
   justify-content: center;
   color: var(--line-faint);
   font-size: 14px;
+  padding: 0 var(--space-6);
+  text-align: center;
 }
 
 .al-app__main {
   display: flex;
   flex: 1;
   min-height: 0;
+  position: relative; /* anchors the on-demand DetailPanel overlay (P7/P8) */
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }

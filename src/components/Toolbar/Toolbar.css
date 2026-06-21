@@ -1,6 +1,8 @@
 .al-toolbar {
-  padding: var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--rule);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  background: var(--paper-raised);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -62,14 +64,55 @@
   color: var(--line);
 }
 
-.al-toolbar__legend-row {
-  flex-basis: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
+.al-toolbar__popover-wrap {
+  position: relative;
+}
+
+.al-toolbar__icon-btn {
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--line-dim);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.al-toolbar__icon-btn:hover {
+  color: var(--line);
+  border-color: var(--line-dim);
+}
+
+.al-toolbar__popover {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
 }
 
 .al-toolbar__warning {
   font-size: 12px;
   color: var(--moved);
+  cursor: help;
+}
+
+.al-toolbar__clear-btn {
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--line-faint);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.al-toolbar__clear-btn:hover {
+  color: var(--removed);
+  border-color: var(--removed);
 }

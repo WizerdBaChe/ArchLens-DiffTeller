@@ -17,6 +17,7 @@ export interface DiffPipelineResult {
   options: DiffOptions;
   setOptions: (o: DiffOptions) => void;
   isEmpty: boolean;
+  reset: () => void;
 }
 
 export function useDiffPipeline(initialLeft = "", initialRight = ""): DiffPipelineResult {
@@ -55,5 +56,9 @@ export function useDiffPipeline(initialLeft = "", initialRight = ""): DiffPipeli
     options,
     setOptions,
     isEmpty: leftTree.nodes.length === 0 && rightTree.nodes.length === 0,
+    reset: () => {
+      setLeftSource("");
+      setRightSource("");
+    },
   };
 }

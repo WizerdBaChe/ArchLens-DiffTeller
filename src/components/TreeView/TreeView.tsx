@@ -139,6 +139,7 @@ export function TreeView({ leftTree, rightTree, diff, selectedId, onSelect, acti
                   isSelected={change?.id === selectedId}
                   onSelect={() => change && onSelect(change)}
                   isDimmed={dimWhenFiltered(change)}
+                  isConnector={isConnector}
                   registerRef={
                     isConnector
                       ? (el) => {
@@ -207,6 +208,7 @@ export function TreeView({ leftTree, rightTree, diff, selectedId, onSelect, acti
                   isSelected={change?.id === selectedId}
                   onSelect={() => change && onSelect(change)}
                   isDimmed={dimWhenFiltered(change)}
+                  isConnector={isConnector}
                   registerRef={
                     isConnector
                       ? (el) => {

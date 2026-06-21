@@ -11,6 +11,7 @@ interface ToolbarProps {
   activeFilters: ReadonlySet<ChangeType>;
   onToggleFilter: (type: ChangeType) => void;
   onResetFilters: () => void;
+  onClearWorkspace: () => void;
 }
 
 function downloadText(content: string, filename: string, mime: string) {
@@ -23,8 +24,9 @@ function downloadText(content: string, filename: string, mime: string) {
   URL.revokeObjectURL(url);
 }
 
-export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters }: ToolbarProps) {
+export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters, onClearWorkspace }: ToolbarProps) {
   const [exportOpen, setExportOpen] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
 
   const handleExport = (format: ExportFormat) => {
     const { content, filename, mime } = exportDiff(diff, format);
@@ -37,6 +39,30 @@ export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters }:
       <SummaryBar summary={diff.summary} />
       <div className="al-toolbar__right">
         <FilterBar active={activeFilters} onToggle={onToggleFilter} onReset={onResetFilters} />
+
+        <div className="al-toolbar__popover-wrap">
+          <button
+            type="button"
+            className="al-toolbar__icon-btn"
+            onClick={() => setLegendOpen((v) => !v)}
+            aria-expanded={legendOpen}
+            title="Show connector legend"
+          >
+            Legend
+          </button>
+          {legendOpen && (
+            <div className="al-toolbar__popover">
+              <Legend />
+            </div>
+          )}
+        </div>
+
+        {diff.warnings.length > 0 && (
+          <span className="al-toolbar__warning" title={diff.warnings.map((w) => w.message).join("\n")}>
+            ⚠ {diff.warnings.length} low-confidence match{diff.warnings.length > 1 ? "es" : ""}
+          </span>
+        )}
+
         <div className="al-toolbar__export">
           <button type="button" className="al-toolbar__export-btn" onClick={() => setExportOpen((v) => !v)}>
             Export ▾
@@ -55,12 +81,10 @@ export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters }:
             </div>
           )}
         </div>
-      </div>
-      <div className="al-toolbar__legend-row">
-        <Legend />
-        {diff.warnings.length > 0 && (
-          <span className="al-toolbar__warning">⚠ {diff.warnings.length} low-confidence match{diff.warnings.length > 1 ? "es" : ""}</span>
-        )}
+
+        <button type="button" className="al-toolbar__clear-btn" onClick={onClearWorkspace}>
+          Clear workspace
+        </button>
       </div>
     </div>
   );

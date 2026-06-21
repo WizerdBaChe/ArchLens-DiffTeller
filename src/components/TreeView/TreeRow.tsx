@@ -55,6 +55,11 @@ interface TreeRowProps {
   isSelected: boolean;
   onSelect: () => void;
   isDimmed: boolean;
+  /** True when this row is one end of a cross-pane connector (moved/renamed/
+   *  case-change). Draws a leader-line stub out to the row's edge so the
+   *  connector dot doesn't appear to float in empty space next to a short
+   *  filename. */
+  isConnector?: boolean;
   registerRef?: (el: HTMLDivElement | null) => void;
 }
 
@@ -68,6 +73,7 @@ export function TreeRow({
   isSelected,
   onSelect,
   isDimmed,
+  isConnector,
   registerRef,
 }: TreeRowProps) {
   const meta = change ? CHANGE_TYPE_META[change.type] : undefined;
@@ -111,6 +117,9 @@ export function TreeRow({
       )}
       {showConfidence && (
         <span className="al-tree-row__confidence">{Math.round(change!.confidence * 100)}%</span>
+      )}
+      {isConnector && meta && (
+        <span className="al-tree-row__stub" style={{ borderColor: `var(${meta.colorVar})` }} aria-hidden="true" />
       )}
     </div>
   );
