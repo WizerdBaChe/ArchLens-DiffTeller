@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { DiffChange } from "@/types/tree";
 import { CHANGE_TYPE_META } from "../changeTypeMeta";
+import { toSingleChangeText } from "@/core/export/exportDiff";
+import { useClipboardFeedback } from "@/hooks/useClipboardFeedback";
 import "./DetailPanel.css";
 
 interface DetailPanelProps {
@@ -13,6 +15,7 @@ export function DetailPanel({ change, onClose }: DetailPanelProps) {
   // so it doesn't flash to an empty state mid-transition.
   const [displayed, setDisplayed] = useState<DiffChange | null>(change);
   const isOpen = change !== null;
+  const { copy, copiedKey } = useClipboardFeedback();
 
   useEffect(() => {
     if (change) setDisplayed(change);
@@ -43,9 +46,18 @@ export function DetailPanel({ change, onClose }: DetailPanelProps) {
               <span className="al-detail-panel__type" style={{ color: `var(${meta.colorVar})` }}>
                 {meta.label}
               </span>
-              <button type="button" className="al-detail-panel__close" onClick={onClose} aria-label="Close detail panel">
-                ×
-              </button>
+              <div className="al-detail-panel__head-actions">
+                <button
+                  type="button"
+                  className="al-detail-panel__copy"
+                  onClick={() => copy(toSingleChangeText(displayed), displayed.id)}
+                >
+                  {copiedKey === displayed.id ? "Copied ✓" : "Copy"}
+                </button>
+                <button type="button" className="al-detail-panel__close" onClick={onClose} aria-label="Close detail panel">
+                  ×
+                </button>
+              </div>
             </div>
 
             {displayed.from && (

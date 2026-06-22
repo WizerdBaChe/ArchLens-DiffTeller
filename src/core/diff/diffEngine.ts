@@ -9,7 +9,7 @@ import type {
 } from "@/types/tree";
 import { classifyPair } from "./classifier";
 
-const LOW_CONFIDENCE_THRESHOLD = 0.75;
+export const LOW_CONFIDENCE_THRESHOLD = 0.75;
 
 function emptySummary(): DiffSummary {
   return { added: 0, removed: 0, moved: 0, renamed: 0, unchanged: 0, modifiedMeta: 0 };

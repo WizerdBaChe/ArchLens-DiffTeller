@@ -146,18 +146,7 @@
 }
 
 .al-input-panel__collapse {
-  background: none;
-  border: 1px solid var(--rule);
-  color: var(--line-dim);
-  font-size: 12px;
-  padding: 8px 14px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-}
-
-.al-input-panel__collapse:hover {
-  color: var(--line);
-  border-color: var(--line-dim);
+  flex-shrink: 0;
 }
 
 /* ---- Collapsed state (P3): compact status strip ---- */
@@ -187,17 +176,7 @@
 
 .al-input-panel__expand {
   margin-left: auto;
-  background: none;
-  border: 1px solid var(--rule);
-  color: var(--line);
-  font-size: 12px;
-  padding: 8px 14px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-}
-
-.al-input-panel__expand:hover {
-  border-color: var(--moved);
+  flex-shrink: 0;
 }
 
 @media (max-width: 860px) {

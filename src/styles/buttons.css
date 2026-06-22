@@ -1,0 +1,56 @@
+/* Two-tier button language, shared across components.
+ *
+ * --ghost: the quiet default — filter chips, "Legend", "Clear workspace".
+ *   Low visual weight is correct here; these are low-stakes toggles.
+ *
+ * --accent: reserved for controls that change what's visible/available in a
+ *   meaningful way (opening an export menu, expanding/collapsing a whole
+ *   section). These must NOT look like the surrounding ghost buttons, or
+ *   people read them as inert decoration and never click them.
+ */
+
+.al-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 120ms ease-out, background 120ms ease-out, color 120ms ease-out;
+  white-space: nowrap;
+}
+
+.al-btn--ghost {
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--line-dim);
+  padding: 6px 12px;
+}
+
+.al-btn--ghost:hover {
+  color: var(--line);
+  border-color: var(--line-dim);
+}
+
+.al-btn--accent {
+  background: var(--moved-dim);
+  border: 1px solid var(--moved);
+  color: var(--moved);
+  font-weight: 600;
+  padding: 7px 14px;
+}
+
+.al-btn--accent:hover {
+  background: var(--moved);
+  color: var(--paper);
+}
+
+.al-btn--accent:focus-visible {
+  outline-offset: 2px;
+}
+
+.al-btn__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}

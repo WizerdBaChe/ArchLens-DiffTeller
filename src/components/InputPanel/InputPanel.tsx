@@ -6,6 +6,23 @@ const MIN_HEIGHT = 110;
 const MAX_HEIGHT = 520;
 const DEFAULT_HEIGHT = 150;
 
+/** Universal disclosure-triangle affordance — same icon for expand/collapse,
+ *  just flipped, so the control reads as "this section can open and close"
+ *  by shape alone, not just by text. */
+function DisclosureChevron({ pointingUp }: { pointingUp: boolean }) {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      aria-hidden="true"
+      style={{ transform: pointingUp ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 150ms ease-out" }}
+    >
+      <path d="M2 3.5 5 7 8 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 interface SideInputProps {
   label: string;
   caption: string;
@@ -153,8 +170,11 @@ export function InputPanel({
         <span className="al-input-panel__status">
           <span className="al-input-panel__status-dot" /> Version B loaded — {rightCount} nodes
         </span>
-        <button type="button" className="al-input-panel__expand" onClick={onToggleCollapsed}>
-          Expand project structure ▾
+        <button type="button" className="al-btn al-btn--accent al-input-panel__expand" onClick={onToggleCollapsed}>
+          Edit project structure
+          <span className="al-btn__icon">
+            <DisclosureChevron pointingUp={false} />
+          </span>
         </button>
       </div>
     );
@@ -206,8 +226,11 @@ export function InputPanel({
           Try a sample diff
         </button>
         {leftCount > 0 || rightCount > 0 ? (
-          <button type="button" className="al-input-panel__collapse" onClick={onToggleCollapsed}>
-            Collapse ▴
+          <button type="button" className="al-btn al-btn--accent al-input-panel__collapse" onClick={onToggleCollapsed}>
+            Done editing — collapse
+            <span className="al-btn__icon">
+              <DisclosureChevron pointingUp={true} />
+            </span>
           </button>
         ) : null}
       </div>

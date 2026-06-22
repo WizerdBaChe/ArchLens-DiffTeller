@@ -45,6 +45,28 @@
   justify-content: space-between;
 }
 
+.al-detail-panel__head-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.al-detail-panel__copy {
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--line-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.al-detail-panel__copy:hover {
+  color: var(--line);
+  border-color: var(--line-dim);
+}
+
 .al-detail-panel__type {
   font-family: var(--font-display);
   font-weight: 600;
