@@ -89,7 +89,7 @@ export const DEFAULT_DIFF_OPTIONS: DiffOptions = {
 
 // ---- Input / parsing boundary -------------------------------------------
 
-export type InputFormat = "text-tree" | "json-tree";
+export type InputFormat = "text-tree" | "json-tree" | "archlens-tree";
 
 export interface ParseError {
   message: string;
