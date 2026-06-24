@@ -11,6 +11,41 @@
 .al-app__header {
   padding: var(--space-5) var(--space-6) var(--space-4);
   border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+/* Phase 4：主題切換器（segmented control，用共用 token 上色） */
+.al-theme-switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  border: 1px solid var(--al-border);
+  border-radius: var(--al-radius-md);
+  overflow: hidden;
+  background: var(--al-surface);
+}
+.al-theme-switch__btn {
+  font-family: var(--al-font-mono, var(--font-mono));
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 6px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--al-text-secondary);
+  cursor: pointer;
+  transition: background var(--al-transition-fast), color var(--al-transition-fast);
+}
+.al-theme-switch__btn + .al-theme-switch__btn {
+  border-left: 1px solid var(--al-border);
+}
+.al-theme-switch__btn:hover {
+  color: var(--al-text);
+}
+.al-theme-switch__btn.is-active {
+  background: var(--al-accent);
+  color: var(--al-accent-contrast);
 }
 
 .al-app__wordmark {

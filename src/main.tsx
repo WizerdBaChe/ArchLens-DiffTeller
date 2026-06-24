@@ -13,6 +13,7 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import "@fontsource/ibm-plex-mono/600.css";
 
+import "./styles/archlens-tokens.css"; // @archlens/tokens（vendored）— 須在本地 tokens 之前
 import "./styles/tokens.css";
 import "./styles/buttons.css";
 
