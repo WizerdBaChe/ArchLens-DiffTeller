@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { textTreeParser } from "@/core/parser/textTreeParser";
 import { jsonTreeParser } from "@/core/parser/jsonTreeParser";
+import { archlensTreeParser } from "@/core/parser/archlensTreeParser";
+import { detectFormat, getParser } from "@/core/parser";
 
 describe("textTreeParser", () => {
   it("parses nested indentation into full paths", () => {
@@ -47,5 +49,57 @@ describe("jsonTreeParser", () => {
     const { errors, nodes } = jsonTreeParser.parse("{not json");
     expect(nodes).toHaveLength(0);
     expect(errors[0].message).toMatch(/Invalid JSON/);
+  });
+});
+
+describe("archlensTreeParser", () => {
+  const envelope = JSON.stringify({
+    archlens: "1.0",
+    kind: "tree",
+    source: { product: "web", name: "Demo" },
+    payload: { nodes: [{ path: "src/app.ts", type: "file" }, { path: "src", type: "dir" }] },
+  });
+
+  it("unwraps a tree envelope and validates its nodes", () => {
+    const { nodes, errors } = archlensTreeParser.parse(envelope);
+    expect(errors).toHaveLength(0);
+    expect(nodes).toEqual([
+      { path: "src/app.ts", kind: "file", contentHash: undefined },
+      { path: "src", kind: "dir", contentHash: undefined },
+    ]);
+  });
+
+  it("rejects an envelope whose kind is not tree", () => {
+    const { errors, nodes } = archlensTreeParser.parse(
+      JSON.stringify({ archlens: "1.0", kind: "graph", payload: { nodes: [] } }),
+    );
+    expect(nodes).toHaveLength(0);
+    expect(errors[0].message).toMatch(/graph/);
+  });
+
+  it("reuses the shared per-row validation (bad type is flagged by row)", () => {
+    const { errors } = archlensTreeParser.parse(
+      JSON.stringify({ archlens: "1.0", kind: "tree", payload: { nodes: [{ path: "a", type: "folder" }] } }),
+    );
+    expect(errors[0].message).toMatch(/nodes\[0\]/);
+  });
+});
+
+describe("detectFormat", () => {
+  it("routes an ArchLens envelope to the envelope parser", () => {
+    const src = JSON.stringify({ archlens: "1.0", kind: "tree", payload: { nodes: [{ path: "a", type: "file" }] } });
+    expect(detectFormat(src)).toBe("archlens-tree");
+    // round-trip: detection + parser should yield the node
+    const { nodes, errors } = getParser(detectFormat(src)).parse(src);
+    expect(errors).toHaveLength(0);
+    expect(nodes.map((n) => n.path)).toEqual(["a"]);
+  });
+
+  it("still routes a bare { nodes } object to json-tree", () => {
+    expect(detectFormat(JSON.stringify({ nodes: [{ path: "a", type: "file" }] }))).toBe("json-tree");
+  });
+
+  it("falls back to text-tree for non-JSON input", () => {
+    expect(detectFormat("src/\n  app.ts")).toBe("text-tree");
   });
 });

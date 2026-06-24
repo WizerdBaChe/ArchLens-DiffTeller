@@ -75,6 +75,44 @@
   text-align: center;
 }
 
+/* Phase 3 handoff banner — surfaces a tree received from ArchLens Web. */
+.al-handoff {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4) var(--space-6) 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+  font-size: 13px;
+  color: var(--line);
+}
+.al-handoff--ok {
+  background: var(--added-dim);
+  border-color: var(--added);
+}
+.al-handoff--warn {
+  background: var(--moved-dim);
+  border-color: var(--moved);
+}
+.al-handoff__text {
+  flex: 1;
+}
+.al-handoff__close {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--line-dim);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+}
+.al-handoff__close:hover {
+  color: var(--line);
+}
+
 .al-app__main {
   display: flex;
   flex: 1;
