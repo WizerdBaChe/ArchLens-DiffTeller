@@ -3,42 +3,29 @@ import { useState } from "react";
 /**
  * 主題切換器（Phase 4 / @archlens/tokens 試點）。
  * 切換掛在 <html> 的 .al-theme-* class，共用 token 與本地 diff-domain 顏色一起換色。
- * 選擇記在 localStorage；index.html 有 no-flash 初始化腳本先行套用同一個值。
+ *
+ * 系列慣例：**預設＝Light，且不持久化**——切換只在當次 session 生效，不寫 localStorage；
+ * 重新載入即重置回 Light（隱私優先，不在裝置留存偏好）。index.html 已靜態掛 al-theme-light。
  */
 
 const THEMES = [
-  { id: "blueprint", label: "Blueprint" },
   { id: "light", label: "Light" },
+  { id: "blueprint", label: "Blueprint" },
   { id: "hacker", label: "Hacker" },
 ] as const;
 
 type ThemeId = (typeof THEMES)[number]["id"];
 
-const STORAGE_KEY = "archlens:diff-theme";
 const CLASSES = THEMES.map((t) => `al-theme-${t.id}`);
 
-function readTheme(): ThemeId {
-  try {
-    const t = localStorage.getItem(STORAGE_KEY);
-    if (t === "blueprint" || t === "light" || t === "hacker") return t;
-  } catch {
-    /* ignore */
-  }
-  return "blueprint";
-}
-
 export function ThemeSwitcher() {
-  const [theme, setTheme] = useState<ThemeId>(readTheme);
+  // 預設 Light；不從 localStorage 讀取（每次載入都重置）。
+  const [theme, setTheme] = useState<ThemeId>("light");
 
   const apply = (next: ThemeId) => {
     const el = document.documentElement;
     el.classList.remove(...CLASSES);
     el.classList.add(`al-theme-${next}`);
-    try {
-      localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      /* ignore */
-    }
     setTheme(next);
   };
 
