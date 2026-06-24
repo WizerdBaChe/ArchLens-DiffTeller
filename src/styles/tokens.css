@@ -1,14 +1,20 @@
 :root {
-  /* ---- Color: blueprint drafting palette ---- */
-  --paper: #0f2e42; /* ground — real blueprint paper, not near-black */
-  --paper-raised: #143a52; /* panels sit one shade up from the ground */
-  --paper-sunken: #0a2233; /* recessed wells (input areas, scrollbars) */
-  --line: #dceef5; /* chalk-white linework / primary text */
-  --line-dim: rgba(220, 238, 245, 0.62); /* secondary text */
-  --line-faint: rgba(220, 238, 245, 0.32); /* tertiary text, placeholders */
-  --grid: rgba(220, 238, 245, 0.03); /* graph-paper texture, kept subtle (P1) */
-  --rule: rgba(220, 238, 245, 0.16); /* hairline dividers */
+  /* ---- @archlens/tokens 採用（Phase 4）----
+     一般色彩角色「別名」到系列共用 token（--al-*），顏色隨主題包（掛在 <html>
+     的 .al-theme-*）切換。字體與圓角刻意維持本地：本產品自帶 IBM Plex / Space
+     Grotesk 字體與招牌圓角。預設主題＝blueprint（值與原本完全相同，零視覺變動）。 */
+  --paper: var(--al-bg);
+  --paper-raised: var(--al-surface);
+  --paper-sunken: var(--al-surface-sunken);
+  --line: var(--al-text); /* chalk-white linework / primary text */
+  --line-dim: var(--al-text-secondary); /* secondary text */
+  --line-faint: var(--al-text-tertiary); /* tertiary text, placeholders */
+  --rule: var(--al-border); /* hairline dividers */
+  --focus-ring: var(--al-focus);
 
+  /* ---- diff-domain 色彩：本產品專屬語意，留本地；各主題包於下方覆寫 ----
+     預設值＝blueprint，與原本相同。 */
+  --grid: rgba(220, 238, 245, 0.03); /* graph-paper texture, kept subtle (P1) */
   --added: #5fd38a; /* drafting green */
   --added-dim: rgba(95, 211, 138, 0.16);
   --removed: #ff6b4a; /* rust / red-pencil */
@@ -21,24 +27,54 @@
   --meta-dim: rgba(111, 184, 214, 0.16);
   --unchanged: rgba(220, 238, 245, 0.4);
 
-  --focus-ring: #f2b84b;
-
   /* ---- Type ---- */
   --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
   --font-body: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
 
-  /* ---- Scale ---- */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 48px;
+  /* ---- Scale ---- 間距採用共用結構 token（值與本地原本相同）；圓角維持招牌本地值 */
+  --space-1: var(--al-space-1);
+  --space-2: var(--al-space-2);
+  --space-3: var(--al-space-3);
+  --space-4: var(--al-space-4);
+  --space-5: var(--al-space-5);
+  --space-6: var(--al-space-6);
+  --space-7: var(--al-space-7);
 
   --radius-sm: 3px;
   --radius-md: 6px;
+}
+
+/* ---- diff-domain 顏色的各主題覆寫 ----
+   blueprint＝上方 :root 預設值。light / hacker 在此重新調色以維持可讀性。
+   掛在 <html> 的 .al-theme-* class 切換時，這些與共用 --al-* 一起生效。 */
+.al-theme-light {
+  --grid: rgba(15, 46, 66, 0.04);
+  --added: #128a6e;
+  --added-dim: rgba(18, 138, 110, 0.12);
+  --removed: #c0392b;
+  --removed-dim: rgba(192, 57, 43, 0.1);
+  --moved: #b4690e;
+  --moved-dim: rgba(180, 105, 14, 0.12);
+  --renamed: #7c3aed;
+  --renamed-dim: rgba(124, 58, 237, 0.1);
+  --meta: #2563eb;
+  --meta-dim: rgba(37, 99, 235, 0.1);
+  --unchanged: rgba(26, 26, 26, 0.4);
+}
+.al-theme-hacker {
+  --grid: rgba(230, 230, 234, 0.03);
+  --added: #39ff6a;
+  --added-dim: rgba(57, 255, 106, 0.14);
+  --removed: #ff6b5b;
+  --removed-dim: rgba(255, 107, 91, 0.14);
+  --moved: #ffb454;
+  --moved-dim: rgba(255, 180, 84, 0.14);
+  --renamed: #c792ea;
+  --renamed-dim: rgba(199, 146, 234, 0.14);
+  --meta: #6fa8ff;
+  --meta-dim: rgba(111, 168, 255, 0.14);
+  --unchanged: rgba(230, 230, 234, 0.4);
 }
 
 * {

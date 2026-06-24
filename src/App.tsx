@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ChangeType, DiffChange } from "@/types/tree";
 import { useDiffPipeline } from "@/hooks/useDiffPipeline";
 import { peekHandoff, clearHandoff, type HandoffOutcome } from "@/handoff";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher/ThemeSwitcher";
 import { InputPanel } from "@/components/InputPanel/InputPanel";
 import { Toolbar } from "@/components/Toolbar/Toolbar";
 import { TreeView } from "@/components/TreeView/TreeView";
@@ -65,13 +66,16 @@ export default function App() {
   return (
     <div className="al-app">
       <header className="al-app__header">
-        <div className="al-app__wordmark">
-          <span className="al-app__wordmark-icon" aria-hidden="true">
-            ⟁
-          </span>
-          ArchLens<span className="al-app__wordmark-accent">Diff</span>
+        <div className="al-app__header-lead">
+          <div className="al-app__wordmark">
+            <span className="al-app__wordmark-icon" aria-hidden="true">
+              ⟁
+            </span>
+            ArchLens<span className="al-app__wordmark-accent">Diff</span>
+          </div>
+          <p className="al-app__tagline">Read the structure that changed, not the lines that moved.</p>
         </div>
-        <p className="al-app__tagline">Read the structure that changed, not the lines that moved.</p>
+        <ThemeSwitcher />
       </header>
 
       {handoffBanner && (
