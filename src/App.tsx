@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeType, DiffChange } from "@/types/tree";
 import { useDiffPipeline } from "@/hooks/useDiffPipeline";
+import { peekHandoff, clearHandoff, type HandoffOutcome } from "@/handoff";
 import { InputPanel } from "@/components/InputPanel/InputPanel";
 import { Toolbar } from "@/components/Toolbar/Toolbar";
 import { TreeView } from "@/components/TreeView/TreeView";
@@ -12,22 +13,38 @@ import "./App.css";
 const DEFAULT_FILTERS: ChangeType[] = ["added", "removed", "moved", "renamed"];
 
 export default function App() {
-  const pipeline = useDiffPipeline();
+  // Phase 3 handoff: read a tree sent from ArchLens Web (pure peek on init, so
+  // the loaded side seeds the initial pipeline source). The cleanup (clearing
+  // localStorage + the URL param) is a side effect and lives in an effect
+  // below — keeping the initializer pure and StrictMode-safe.
+  const [handoff] = useState<HandoffOutcome>(peekHandoff);
+  const initialLeft = handoff?.status === "loaded" && handoff.side === "left" ? handoff.json : "";
+  const initialRight = handoff?.status === "loaded" && handoff.side === "right" ? handoff.json : "";
+
+  const pipeline = useDiffPipeline(initialLeft, initialRight);
   const [selected, setSelected] = useState<DiffChange | null>(null);
   const [activeFilters, setActiveFilters] = useState<Set<ChangeType>>(new Set(DEFAULT_FILTERS));
   const [inputCollapsed, setInputCollapsed] = useState(false);
+  const [handoffBanner, setHandoffBanner] = useState<HandoffOutcome>(handoff);
 
   // P3 / P5: the first time a comparison produces a result, collapse the
   // input section automatically so analysis becomes the focus. Tracked via
   // a ref (not state) because we only care about the true→false edge, not
-  // every render.
-  const wasEmpty = useRef(true);
+  // every render. Seeded with the current emptiness so a handoff-preloaded
+  // side doesn't trigger an immediate collapse — the person should still see
+  // the input panel to fill in the other version.
+  const wasEmpty = useRef(pipeline.isEmpty);
   useEffect(() => {
     if (wasEmpty.current && !pipeline.isEmpty) {
       setInputCollapsed(true);
     }
     wasEmpty.current = pipeline.isEmpty;
   }, [pipeline.isEmpty]);
+
+  // After mount, clear the consumed handoff so a refresh doesn't re-import.
+  useEffect(() => {
+    if (handoff) clearHandoff();
+  }, [handoff]);
 
   const toggleFilter = (type: ChangeType) => {
     setActiveFilters((prev) => {
@@ -56,6 +73,33 @@ export default function App() {
         </div>
         <p className="al-app__tagline">Read the structure that changed, not the lines that moved.</p>
       </header>
+
+      {handoffBanner && (
+        <div
+          className={`al-handoff al-handoff--${handoffBanner.status === "loaded" ? "ok" : "warn"}`}
+          role="status"
+        >
+          <span className="al-handoff__text">
+            {handoffBanner.status === "loaded" ? (
+              <>
+                從 ArchLens Web 匯入了 <strong>{handoffBanner.count}</strong> 個節點
+                {handoffBanner.name ? <> （{handoffBanner.name}）</> : null} 到
+                {handoffBanner.side === "left" ? "左" : "右"}側 —— 請在另一側貼上要比較的版本。
+              </>
+            ) : (
+              <>收到 Web 的比較請求，但找不到交接資料（跨來源時不共享）。請改用上方手動貼上 / 匯入。</>
+            )}
+          </span>
+          <button
+            type="button"
+            className="al-handoff__close"
+            aria-label="Dismiss"
+            onClick={() => setHandoffBanner(null)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <section className="al-app__section" aria-labelledby="al-section-structure">
         <span id="al-section-structure" className="al-section-eyebrow">
