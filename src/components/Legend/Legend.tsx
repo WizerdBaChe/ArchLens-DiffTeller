@@ -1,13 +1,15 @@
-import { CHANGE_TYPE_META } from "../changeTypeMeta";
+import { useLocale } from "@/i18n";
+import { changeTypeMeta } from "../changeTypeMeta";
 import "./Legend.css";
 
 const LEGEND_TYPES = ["moved", "renamed", "modified-meta"] as const;
 
 export function Legend() {
+  const { t } = useLocale();
   return (
-    <div className="al-legend" aria-label="Connector legend">
+    <div className="al-legend" aria-label={t.legendAria}>
       {LEGEND_TYPES.map((type) => {
-        const meta = CHANGE_TYPE_META[type];
+        const meta = changeTypeMeta(type, t);
         return (
           <span className="al-legend__item" key={type}>
             <svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true">
@@ -27,7 +29,7 @@ export function Legend() {
           </span>
         );
       })}
-      <span className="al-legend__item al-legend__item--note">dashed = lower-confidence guess</span>
+      <span className="al-legend__item al-legend__item--note">{t.legendNote}</span>
     </div>
   );
 }

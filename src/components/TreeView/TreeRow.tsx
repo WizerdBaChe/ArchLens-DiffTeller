@@ -1,5 +1,6 @@
 import type { DiffChange, NormalizedNode } from "@/types/tree";
-import { CHANGE_TYPE_META } from "../changeTypeMeta";
+import { useLocale } from "@/i18n";
+import { changeTypeMeta } from "../changeTypeMeta";
 import "./TreeRow.css";
 
 function FolderIcon() {
@@ -55,10 +56,6 @@ interface TreeRowProps {
   isSelected: boolean;
   onSelect: () => void;
   isDimmed: boolean;
-  /** True when this row is one end of a cross-pane connector (moved/renamed/
-   *  case-change). Draws a leader-line stub out to the row's edge so the
-   *  connector dot doesn't appear to float in empty space next to a short
-   *  filename. */
   isConnector?: boolean;
   registerRef?: (el: HTMLDivElement | null) => void;
 }
@@ -76,7 +73,8 @@ export function TreeRow({
   isConnector,
   registerRef,
 }: TreeRowProps) {
-  const meta = change ? CHANGE_TYPE_META[change.type] : undefined;
+  const { t } = useLocale();
+  const meta = change ? changeTypeMeta(change.type, t) : undefined;
   const showConfidence = change && change.confidence < 1 && change.type !== "unchanged";
 
   return (

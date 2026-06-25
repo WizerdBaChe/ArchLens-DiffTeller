@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ChangeType, DiffResult } from "@/types/tree";
+import { useLocale } from "@/i18n";
 import { SummaryBar } from "../SummaryBar/SummaryBar";
 import { FilterBar } from "../FilterBar/FilterBar";
 import { Legend } from "../Legend/Legend";
@@ -41,29 +42,22 @@ function ExportIcon() {
   );
 }
 
-const PRIMARY_FORMATS: Array<{ format: ExportFormat; label: string }> = [
-  { format: "json", label: "JSON" },
-  { format: "csv", label: "CSV" },
-  { format: "md", label: "Markdown report" },
-];
-
-const DERIVED_FORMATS: Array<{ format: ExportFormat; label: string; hint: string }> = [
-  {
-    format: "ai-prompt",
-    label: "Copy for AI",
-    hint: "The diff JSON with a short field legend in front — paste straight into a chat AI.",
-  },
-  {
-    format: "worksheet",
-    label: "Migration worksheet",
-    hint: "A review checklist for moved/renamed items. Not an executable script — for you (or an AI) to confirm before anything is applied.",
-  },
-];
-
 export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters, onClearWorkspace }: ToolbarProps) {
+  const { t } = useLocale();
   const [exportOpen, setExportOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
   const { copy, copiedKey } = useClipboardFeedback();
+
+  const primaryFormats: Array<{ format: ExportFormat; label: string }> = [
+    { format: "json", label: t.exportJson },
+    { format: "csv", label: t.exportCsv },
+    { format: "md", label: t.exportMd },
+  ];
+
+  const derivedFormats: Array<{ format: ExportFormat; label: string; hint: string }> = [
+    { format: "ai-prompt", label: t.exportAiPrompt, hint: t.exportAiPromptHint },
+    { format: "worksheet", label: t.exportWorksheet, hint: t.exportWorksheetHint },
+  ];
 
   const handleDownload = (format: ExportFormat) => {
     const { content, filename, mime } = exportDiff(diff, format);
@@ -80,10 +74,10 @@ export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters, o
       <span className="al-toolbar__export-label">{label}</span>
       <div className="al-toolbar__export-actions">
         <button type="button" role="menuitem" onClick={() => handleCopy(format)}>
-          {copiedKey === format ? "Copied ✓" : "Copy"}
+          {copiedKey === format ? t.toolbarCopied : t.toolbarCopy}
         </button>
         <button type="button" role="menuitem" onClick={() => handleDownload(format)}>
-          Download
+          {t.toolbarDownload}
         </button>
       </div>
       {hint && <p className="al-toolbar__export-hint">{hint}</p>}
@@ -103,9 +97,9 @@ export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters, o
               className="al-btn al-btn--ghost"
               onClick={() => setLegendOpen((v) => !v)}
               aria-expanded={legendOpen}
-              title="Show connector legend"
+              title={t.toolbarLegendAria}
             >
-              Legend
+              {t.toolbarLegend}
             </button>
             {legendOpen && (
               <div className="al-toolbar__popover">
@@ -116,7 +110,7 @@ export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters, o
 
           {diff.warnings.length > 0 && (
             <span className="al-toolbar__warning" title={diff.warnings.map((w) => w.message).join("\n")}>
-              ⚠ {diff.warnings.length} low-confidence match{diff.warnings.length > 1 ? "es" : ""}
+              {t.toolbarWarnings(diff.warnings.length)}
             </span>
           )}
         </div>
@@ -130,25 +124,25 @@ export function Toolbar({ diff, activeFilters, onToggleFilter, onResetFilters, o
               className="al-btn al-btn--accent"
               onClick={() => setExportOpen((v) => !v)}
               aria-expanded={exportOpen}
-              title="Copy or download this diff — for a PR, a changelog, or an AI"
+              title={t.toolbarExportTitle}
             >
               <span className="al-btn__icon">
                 <ExportIcon />
               </span>
-              Copy / Export ▾
+              {t.toolbarCopyExport}
             </button>
             {exportOpen && (
               <div className="al-toolbar__export-menu" role="menu">
-                <p className="al-toolbar__export-menu-title">Get this diff out — for a PR, a changelog, or an AI</p>
-                {PRIMARY_FORMATS.map((f) => renderRow(f.format, f.label))}
+                <p className="al-toolbar__export-menu-title">{t.toolbarExportMenuTitle}</p>
+                {primaryFormats.map((f) => renderRow(f.format, f.label))}
                 <div className="al-toolbar__export-divider" />
-                {DERIVED_FORMATS.map((f) => renderRow(f.format, f.label, f.hint))}
+                {derivedFormats.map((f) => renderRow(f.format, f.label, f.hint))}
               </div>
             )}
           </div>
 
           <button type="button" className="al-btn al-btn--ghost" onClick={onClearWorkspace}>
-            Clear workspace
+            {t.toolbarClearWorkspace}
           </button>
         </div>
       </div>

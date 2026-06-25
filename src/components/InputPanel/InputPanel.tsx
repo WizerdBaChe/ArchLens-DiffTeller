@@ -1,14 +1,12 @@
 import { useCallback, useRef, useState } from "react";
 import type { ParseError } from "@/types/tree";
+import { useLocale } from "@/i18n";
 import "./InputPanel.css";
 
 const MIN_HEIGHT = 110;
 const MAX_HEIGHT = 520;
 const DEFAULT_HEIGHT = 150;
 
-/** Universal disclosure-triangle affordance — same icon for expand/collapse,
- *  just flipped, so the control reads as "this section can open and close"
- *  by shape alone, not just by text. */
 function DisclosureChevron({ pointingUp }: { pointingUp: boolean }) {
   return (
     <svg
@@ -31,9 +29,12 @@ interface SideInputProps {
   errors: ParseError[];
   placeholder: string;
   height: number;
+  loadFileLabel: string;
+  linePrefix: (line: number) => string;
+  moreErrors: (count: number) => string;
 }
 
-function SideInput({ label, caption, value, onChange, errors, placeholder, height }: SideInputProps) {
+function SideInput({ label, caption, value, onChange, errors, placeholder, height, loadFileLabel, linePrefix, moreErrors }: SideInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
@@ -48,7 +49,7 @@ function SideInput({ label, caption, value, onChange, errors, placeholder, heigh
         <span className="al-input-side__label">{label}</span>
         <span className="al-input-side__caption">{caption}</span>
         <button type="button" className="al-input-side__load" onClick={() => fileInputRef.current?.click()}>
-          Load file…
+          {loadFileLabel}
         </button>
         <input
           ref={fileInputRef}
@@ -80,11 +81,11 @@ function SideInput({ label, caption, value, onChange, errors, placeholder, heigh
         <ul className="al-input-side__errors" role="alert">
           {errors.slice(0, 4).map((err, i) => (
             <li key={i}>
-              {err.line ? `Line ${err.line}: ` : ""}
+              {err.line ? linePrefix(err.line) : ""}
               {err.message}
             </li>
           ))}
-          {errors.length > 4 && <li>…and {errors.length - 4} more</li>}
+          {errors.length > 4 && <li>{moreErrors(errors.length - 4)}</li>}
         </ul>
       )}
     </div>
@@ -136,6 +137,7 @@ export function InputPanel({
   collapsed,
   onToggleCollapsed,
 }: InputPanelProps) {
+  const { t } = useLocale();
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
   const dragState = useRef<{ startY: number; startHeight: number } | null>(null);
 
@@ -165,13 +167,13 @@ export function InputPanel({
     return (
       <div className="al-input-panel al-input-panel--collapsed">
         <span className="al-input-panel__status">
-          <span className="al-input-panel__status-dot" /> Version A loaded — {leftCount} nodes
+          <span className="al-input-panel__status-dot" /> {t.inputStatusLoaded(leftCount)}
         </span>
         <span className="al-input-panel__status">
-          <span className="al-input-panel__status-dot" /> Version B loaded — {rightCount} nodes
+          <span className="al-input-panel__status-dot" /> {t.inputStatusLoaded(rightCount)}
         </span>
         <button type="button" className="al-btn al-btn--accent al-input-panel__expand" onClick={onToggleCollapsed}>
-          Edit project structure
+          {t.inputEditExpand}
           <span className="al-btn__icon">
             <DisclosureChevron pointingUp={false} />
           </span>
@@ -184,22 +186,28 @@ export function InputPanel({
     <div className="al-input-panel">
       <div className="al-input-panel__grid">
         <SideInput
-          label="Version A"
-          caption="before"
+          label={t.inputVersionA}
+          caption={t.inputCaptionA}
           value={leftSource}
           onChange={onLeftChange}
           errors={leftErrors}
-          placeholder={"Paste an indented tree or tree-command output…\n\nsrc/\n  app.ts\n  lib/\n    api.ts"}
+          placeholder={t.inputPlaceholderA}
           height={height}
+          loadFileLabel={t.inputLoadFile}
+          linePrefix={t.inputLinePrefix}
+          moreErrors={t.inputMoreErrors}
         />
         <SideInput
-          label="Version B"
-          caption="after"
+          label={t.inputVersionB}
+          caption={t.inputCaptionB}
           value={rightSource}
           onChange={onRightChange}
           errors={rightErrors}
-          placeholder={"Paste the version to compare against…\n\nsrc/\n  core/\n    app.ts\n  lib/\n    api.ts"}
+          placeholder={t.inputPlaceholderB}
           height={height}
+          loadFileLabel={t.inputLoadFile}
+          linePrefix={t.inputLinePrefix}
+          moreErrors={t.inputMoreErrors}
         />
       </div>
 
@@ -208,8 +216,8 @@ export function InputPanel({
         onMouseDown={onDragStart}
         role="separator"
         aria-orientation="horizontal"
-        aria-label="Resize input area"
-        title="Drag to resize both panels together"
+        aria-label={t.inputResizeAria}
+        title={t.inputResizeTitle}
       >
         <span className="al-input-panel__resize-grip" />
       </div>
@@ -223,11 +231,11 @@ export function InputPanel({
             onRightChange(SAMPLE_RIGHT);
           }}
         >
-          Try a sample diff
+          {t.inputTrySample}
         </button>
         {leftCount > 0 || rightCount > 0 ? (
           <button type="button" className="al-btn al-btn--accent al-input-panel__collapse" onClick={onToggleCollapsed}>
-            Done editing — collapse
+            {t.inputDoneCollapse}
             <span className="al-btn__icon">
               <DisclosureChevron pointingUp={true} />
             </span>

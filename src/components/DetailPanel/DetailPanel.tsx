@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { DiffChange } from "@/types/tree";
-import { CHANGE_TYPE_META } from "../changeTypeMeta";
+import { useLocale } from "@/i18n";
+import { changeTypeMeta } from "../changeTypeMeta";
 import { toSingleChangeText } from "@/core/export/exportDiff";
 import { useClipboardFeedback } from "@/hooks/useClipboardFeedback";
 import "./DetailPanel.css";
@@ -11,6 +12,7 @@ interface DetailPanelProps {
 }
 
 export function DetailPanel({ change, onClose }: DetailPanelProps) {
+  const { t } = useLocale();
   // Keep rendering the last-selected change while the drawer animates shut,
   // so it doesn't flash to an empty state mid-transition.
   const [displayed, setDisplayed] = useState<DiffChange | null>(change);
@@ -30,7 +32,7 @@ export function DetailPanel({ change, onClose }: DetailPanelProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
 
-  const meta = displayed ? CHANGE_TYPE_META[displayed.type] : null;
+  const meta = displayed ? changeTypeMeta(displayed.type, t) : null;
 
   return (
     <>
@@ -52,9 +54,9 @@ export function DetailPanel({ change, onClose }: DetailPanelProps) {
                   className="al-detail-panel__copy"
                   onClick={() => copy(toSingleChangeText(displayed), displayed.id)}
                 >
-                  {copiedKey === displayed.id ? "Copied ✓" : "Copy"}
+                  {copiedKey === displayed.id ? t.detailCopied : t.detailCopy}
                 </button>
-                <button type="button" className="al-detail-panel__close" onClick={onClose} aria-label="Close detail panel">
+                <button type="button" className="al-detail-panel__close" onClick={onClose} aria-label={t.detailClose}>
                   ×
                 </button>
               </div>
@@ -62,22 +64,22 @@ export function DetailPanel({ change, onClose }: DetailPanelProps) {
 
             {displayed.from && (
               <div className="al-detail-panel__row">
-                <span className="al-detail-panel__label">From</span>
+                <span className="al-detail-panel__label">{t.detailFrom}</span>
                 <code className="al-detail-panel__path">{displayed.from}</code>
               </div>
             )}
             {displayed.to && (
               <div className="al-detail-panel__row">
-                <span className="al-detail-panel__label">To</span>
+                <span className="al-detail-panel__label">{t.detailTo}</span>
                 <code className="al-detail-panel__path">{displayed.to}</code>
               </div>
             )}
             <div className="al-detail-panel__row">
-              <span className="al-detail-panel__label">Kind</span>
+              <span className="al-detail-panel__label">{t.detailKind}</span>
               <span>{displayed.kind}</span>
             </div>
             <div className="al-detail-panel__row">
-              <span className="al-detail-panel__label">Confidence</span>
+              <span className="al-detail-panel__label">{t.detailConfidence}</span>
               <span className="al-detail-panel__confidence-bar">
                 <span
                   className="al-detail-panel__confidence-fill"
@@ -87,7 +89,7 @@ export function DetailPanel({ change, onClose }: DetailPanelProps) {
               <span>{Math.round(displayed.confidence * 100)}%</span>
             </div>
             <div className="al-detail-panel__reason">
-              <span className="al-detail-panel__label">Why</span>
+              <span className="al-detail-panel__label">{t.detailWhy}</span>
               <p>{displayed.reason}</p>
             </div>
           </>
