@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import { LocaleProvider } from "./i18n";
 
 // Self-hosted fonts — bundled by Vite into dist/, no CDN call at runtime.
 import "@fontsource/space-grotesk/500.css";
@@ -19,6 +20,8 @@ import "./styles/buttons.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <LocaleProvider>
+      <App />
+    </LocaleProvider>
   </React.StrictMode>,
 );

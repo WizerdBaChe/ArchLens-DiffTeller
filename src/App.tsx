@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ChangeType, DiffChange } from "@/types/tree";
 import { useDiffPipeline } from "@/hooks/useDiffPipeline";
 import { peekHandoff, clearHandoff, type HandoffOutcome } from "@/handoff";
+import { useLocale, LanguageSwitcher } from "@/i18n";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher/ThemeSwitcher";
 import { InputPanel } from "@/components/InputPanel/InputPanel";
 import { Toolbar } from "@/components/Toolbar/Toolbar";
@@ -9,11 +10,13 @@ import { TreeView } from "@/components/TreeView/TreeView";
 import { DetailPanel } from "@/components/DetailPanel/DetailPanel";
 import "./App.css";
 
-// P6: default view emphasizes the four primary change types; unchanged /
+// P6: default view emphasises the four primary change types; unchanged /
 // modified-meta start dimmed until the person explicitly clicks "All".
 const DEFAULT_FILTERS: ChangeType[] = ["added", "removed", "moved", "renamed"];
 
 export default function App() {
+  const { t } = useLocale();
+
   // Phase 3 handoff: read a tree sent from ArchLens Web (pure peek on init, so
   // the loaded side seeds the initial pipeline source). The cleanup (clearing
   // localStorage + the URL param) is a side effect and lives in an effect
@@ -71,11 +74,14 @@ export default function App() {
             <span className="al-app__wordmark-icon" aria-hidden="true">
               ⟁
             </span>
-            ArchLens<span className="al-app__wordmark-accent">Diff</span>
+            ArchLens<span className="al-app__wordmark-accent">DiffTeller</span>
           </div>
-          <p className="al-app__tagline">Read the structure that changed, not the lines that moved.</p>
+          <p className="al-app__tagline">{t.tagline}</p>
         </div>
-        <ThemeSwitcher />
+        <div className="al-app__header-controls">
+          <LanguageSwitcher />
+          <ThemeSwitcher />
+        </div>
       </header>
 
       {handoffBanner && (
@@ -85,19 +91,15 @@ export default function App() {
         >
           <span className="al-handoff__text">
             {handoffBanner.status === "loaded" ? (
-              <>
-                從 ArchLens Web 匯入了 <strong>{handoffBanner.count}</strong> 個節點
-                {handoffBanner.name ? <> （{handoffBanner.name}）</> : null} 到
-                {handoffBanner.side === "left" ? "左" : "右"}側 —— 請在另一側貼上要比較的版本。
-              </>
+              t.handoffLoaded(handoffBanner.count, handoffBanner.name ?? null, handoffBanner.side)
             ) : (
-              <>收到 Web 的比較請求，但沒有可自動帶入的資料（跨來源不共享，或結構過大已改為下載）。請改用上方手動貼上 / 匯入 —— 若剛下載了 JSON，直接上傳即可。</>
+              t.handoffWarn
             )}
           </span>
           <button
             type="button"
             className="al-handoff__close"
-            aria-label="Dismiss"
+            aria-label={t.handoffDismiss}
             onClick={() => setHandoffBanner(null)}
           >
             ✕
@@ -107,7 +109,7 @@ export default function App() {
 
       <section className="al-app__section" aria-labelledby="al-section-structure">
         <span id="al-section-structure" className="al-section-eyebrow">
-          01 — Project structure
+          {t.sectionStructure}
         </span>
         <InputPanel
           leftSource={pipeline.leftSource}
@@ -125,13 +127,13 @@ export default function App() {
 
       {pipeline.isEmpty ? (
         <div className="al-app__empty">
-          <p>Paste both versions above, or load the sample, to see what moved.</p>
+          <p>{t.emptyHint}</p>
         </div>
       ) : (
         <>
           <section className="al-app__section" aria-labelledby="al-section-summary">
             <span id="al-section-summary" className="al-section-eyebrow">
-              02 — Change summary
+              {t.sectionSummary}
             </span>
             <Toolbar
               diff={pipeline.diff}
@@ -144,7 +146,7 @@ export default function App() {
 
           <section className="al-app__section al-app__section--fill" aria-labelledby="al-section-diff">
             <span id="al-section-diff" className="al-section-eyebrow">
-              03 — Diff visualization
+              {t.sectionDiff}
             </span>
             <div className="al-app__main">
               <TreeView

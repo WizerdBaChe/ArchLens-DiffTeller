@@ -1,7 +1,8 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLocale } from "@/i18n";
 import type { ChangeType, DiffChange, DiffResult, NormalizedTree } from "@/types/tree";
 import { buildHierarchy, flattenHierarchy } from "@/core/normalize/normalizeTree";
-import { CHANGE_TYPE_META } from "../changeTypeMeta";
+import { changeTypeMeta } from "../changeTypeMeta";
 import { TreeRow } from "./TreeRow";
 import "./TreeView.css";
 
@@ -26,6 +27,7 @@ interface TreeViewProps {
 }
 
 export function TreeView({ leftTree, rightTree, diff, selectedId, onSelect, activeFilters }: TreeViewProps) {
+  const { t } = useLocale();
   const [collapsedLeft, setCollapsedLeft] = useState<Set<string>>(new Set());
   const [collapsedRight, setCollapsedRight] = useState<Set<string>>(new Set());
   const [positions, setPositions] = useState<ConnectorPos[]>([]);
@@ -91,7 +93,7 @@ export function TreeView({ leftTree, rightTree, diff, selectedId, onSelect, acti
           id: c.id,
           y1: lRect.top + lRect.height / 2 - laneRect.top,
           y2: rRect.top + rRect.height / 2 - laneRect.top,
-          colorVar: CHANGE_TYPE_META[c.type].colorVar,
+          colorVar: changeTypeMeta(c.type, t).colorVar,
           dashed: c.confidence < 0.85,
           confidence: c.confidence,
         });
@@ -115,9 +117,9 @@ export function TreeView({ leftTree, rightTree, diff, selectedId, onSelect, acti
   return (
     <div className="al-tree-view">
       <div className="al-tree-view__headers">
-        <span className="al-tree-view__header">Version A</span>
+        <span className="al-tree-view__header">{t.inputVersionA}</span>
         <span className="al-tree-view__header al-tree-view__header--lane" />
-        <span className="al-tree-view__header">Version B</span>
+        <span className="al-tree-view__header">{t.inputVersionB}</span>
       </div>
       <div className="al-tree-view__scroll">
         <div className="al-tree-view__flex">

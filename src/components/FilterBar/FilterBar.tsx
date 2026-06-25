@@ -1,5 +1,6 @@
 import type { ChangeType } from "@/types/tree";
-import { CHANGE_TYPE_META, FILTERABLE_TYPES } from "../changeTypeMeta";
+import { useLocale } from "@/i18n";
+import { FILTERABLE_TYPES, changeTypeMeta } from "../changeTypeMeta";
 import "./FilterBar.css";
 
 interface FilterBarProps {
@@ -9,19 +10,20 @@ interface FilterBarProps {
 }
 
 export function FilterBar({ active, onToggle, onReset }: FilterBarProps) {
+  const { t } = useLocale();
   const allActive = active.size === 0;
   return (
-    <div className="al-filter-bar" role="group" aria-label="Filter by change type">
+    <div className="al-filter-bar" role="group" aria-label={t.filterAria}>
       <button
         type="button"
         className={`al-filter-chip ${allActive ? "al-filter-chip--on" : ""}`}
         onClick={onReset}
         aria-pressed={allActive}
       >
-        All
+        {t.filterAll}
       </button>
       {FILTERABLE_TYPES.map((type) => {
-        const meta = CHANGE_TYPE_META[type];
+        const meta = changeTypeMeta(type, t);
         const isOn = active.has(type);
         return (
           <button
