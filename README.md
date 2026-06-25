@@ -1,74 +1,128 @@
 # ArchLens Diff
 
-A structural diff tool for project trees. Instead of line-by-line text diff, it
-classifies what happened between two versions of a tree: **added, removed,
-moved, renamed,** or **modified-meta** (case/extension/type changes) — per the
-[product blueprint](#) this was built from.
+**專案樹的結構差異工具 — 看出版本之間「增 / 刪 / 移動 / 改名」，而非逐行文字差異。**  
+**A structural diff for project trees — see what was added / removed / moved / renamed between two versions, not line-by-line text diff.**
+
+所有比對完全在瀏覽器中執行 — 你的檔案永遠不會離開你的電腦。  
+Everything runs entirely in your browser — your files never leave your machine.
+
+---
+
+**語言 / Language:** 繁體中文 | [English](#english-version)
+
+---
+
+## 繁體中文
+
+### 功能介紹
+
+一般的文字 diff 只告訴你哪幾行變了。ArchLens Diff 看的是**結構**：給它兩份專案樹，它會分類兩版之間到底發生了什麼——
+
+- **新增（added）** / **刪除（removed）**
+- **移動（moved）** — 同一個檔案換了所在目錄
+- **改名（renamed）** — 同一個目錄下檔名改變
+- **改了 meta（modified-meta）** — 大小寫 / 副檔名 / 類型變動
+
+移動與改名是用**相似度啟發式**比對出來的：每一筆都帶有信心度（0–1）與人類可讀的判定理由，信心低於門檻會被標為警告——沒有任何判定是靜默發生的。
+
+這是 [ArchLens 系列](../AGENTS.md) 的 `compare`（比較）階段：它**消費** `tree`、**產生** `diff`。
+
+無需帳號。無需伺服器。無需上傳。100% 瀏覽器端。
+
+---
+
+### 使用方式
 
 ```
 npm install
 npm run dev        # http://localhost:5173
-npm test           # core engine unit tests
+npm test           # 核心引擎單元測試（vitest）
+npm run build      # 生產建置 → dist/
+npm run typecheck  # tsc --noEmit
+```
+
+貼上 / 載入**兩份**專案樹（舊版、新版），自動偵測格式並比對。支援兩種輸入格式：
+
+1. **縮排文字樹** — 純縮排（目錄帶結尾 `/`），或 `tree` 指令的 `├──` / `└──` / `│` 輸出。
+2. **正規化 JSON** — `{ "nodes": [{ "path": "src/app.ts", "type": "file" }] }`（系列共用的 `tree` payload 基準）。
+
+---
+
+### 分類規則
+
+| 類型 | 規則 |
+|---|---|
+| `unchanged` | 兩側 path 與類型都相同 |
+| `modified-meta` | 同 path 不同類型；或忽略大小寫相同、大小寫不同 |
+| `renamed` | 同一父目錄，檔名相似度 ≥ 門檻（或內容雜湊相同） |
+| `moved` | 不同父目錄，檔名相似度 ≥ 門檻（或內容雜湊相同） |
+| `added` / `removed` | 在另一側找不到合理對應 |
+
+---
+
+### 設計方向
+
+對象是「正在 review 結構差異」的工程師，所以視覺語言是字面意義的**建築藍圖**——藍圖底色上的白色線稿。招牌元素是兩棵樹之間的「尺寸線」連接道：被判定為移動 / 改名的節點，會以製圖風格的引線連起來並標上信心度百分比，信心低時改為虛線。
+
+---
+
+### 隱私
+
+所有比對均在你的瀏覽器中執行。任何檔案內容或比對結果都不會送往任何伺服器。
+
+---
+
+### 開發者 & 貢獻者
+
+完整架構（層級邊界、分類規則、相似度啟發式的設計理由）與擴充點，請參閱 [DEV_README.md](DEV_README.md)。
+
+---
+
+## English Version
+
+### What It Does
+
+A normal text diff only tells you which lines changed. ArchLens Diff looks at
+**structure**: give it two project trees and it classifies what actually happened
+between the two versions —
+
+- **added** / **removed**
+- **moved** — same file, different directory
+- **renamed** — same directory, changed filename
+- **modified-meta** — case / extension / type changes
+
+Moved and renamed nodes are matched with a **similarity heuristic**: every match
+carries a confidence (0–1) and a human-readable reason, and anything below the
+threshold is flagged as a warning — nothing is asserted silently.
+
+This is the `compare` stage of the [ArchLens suite](../AGENTS.md): it **consumes**
+a `tree` and **produces** a `diff`.
+
+No account needed. No server. No upload. 100% browser-side.
+
+---
+
+### How to Use
+
+```
+npm install
+npm run dev        # http://localhost:5173
+npm test           # core engine unit tests (vitest)
 npm run build      # production build → dist/
 npm run typecheck  # tsc --noEmit
 ```
 
-## Why it's structured this way
+Paste / load **two** project trees (old, new); the format is auto-detected and
+diffed. Two input formats are supported:
 
-The codebase is split into three layers with a strict dependency direction —
-**components depend on core, core never depends on components**:
-
-```
-src/
-  types/tree.ts          ← shared contracts. Zero dependencies. Everything else
-                            depends inward on this; it depends on nothing.
-  core/                   ← pure functions, no React, fully unit-testable
-    parser/               · text-tree and JSON parsers, behind a TreeParser
-                             interface (strategy pattern: new format = new file
-                             + one registry line, nothing else changes)
-    normalize/             · RawNode[] → NormalizedTree, synthesizes missing
-                             ancestor directories, builds/flattens hierarchy
-    diff/                  · diffEngine (pass ordering) + classifier (single-
-                             pair scoring) + similarity (string metric) — each
-                             piece is independently swappable
-    export/                · DiffResult → json/csv/md strings, no DOM/file APIs
-  hooks/
-    useDiffPipeline.ts    ← the ONLY seam between core and React. Components
-                             never import parser/diff/normalize directly.
-  components/             ← presentational, each owns its own .css + concerns
-```
-
-This means:
-- **The diff algorithm is tested without React** (`core/diff/diffEngine.test.ts`
-  asserts against the RPD's own worked example — `src/app.ts` moving into
-  `src/core/app.ts`).
-- **Adding an input format** (e.g. a zip manifest, `git ls-tree` output) means
-  writing one new file implementing `TreeParser` and adding it to the registry
-  in `core/parser/index.ts` — no other file changes.
-- **Tuning the rename/move heuristic** is isolated to `classifier.ts`; the
-  engine's pass ordering (exact match → case-only → heuristic match → leftover
-  add/remove) lives separately in `diffEngine.ts` and doesn't know *how*
-  matches are scored, only that they are.
-- **Swapping the renderer** (e.g. virtualizing the tree for huge projects)
-  only touches `components/`; the data contract (`DiffResult`) stays put.
-
-## Input formats
-
-Two formats are auto-detected on paste (`core/parser/detectFormat`):
-
-1. **Indented text tree** — either plain indentation with trailing `/` on
-   directories, or raw `tree`-command output with `├──`/`└──`/`│` glyphs.
-   Directories are inferred structurally (anything with children is a
-   directory) *and* from the trailing slash, so both conventions work even
-   without `tree -F`.
+1. **Indented text tree** — plain indentation (directories end with `/`), or raw
+   `tree`-command output with `├──` / `└──` / `│` glyphs.
 2. **Normalized JSON** — `{ "nodes": [{ "path": "src/app.ts", "type": "file" }] }`
-   per the RPD's input-mode B. Missing ancestor directories are synthesized
-   automatically during normalization.
+   (the suite's shared `tree` payload baseline).
 
-(Zip-snapshot input, mode C in the RPD, is intentionally deferred — see
-Known limitations below.)
+---
 
-## Classification rules
+### Classification Rules
 
 | Type | Rule |
 |---|---|
@@ -78,41 +132,26 @@ Known limitations below.)
 | `moved` | Different parent directory, filename similarity ≥ threshold (or identical content hash) |
 | `added` / `removed` | No plausible match found on the other side |
 
-Matching for renamed/moved is a **greedy best-score-first assignment** across
-all same-kind left/right candidates — an O(n·m log(n·m)) approximation of
-optimal bipartite matching, which is the right MVP trade-off per the RPD's
-quality-over-speed ranking without needing a full assignment-problem solver.
-Every heuristic match carries a `confidence` (0–1) and a human-readable
-`reason`, surfaced in the detail panel and flagged as a warning below 75%
-confidence — this directly answers the RPD's biggest stated risk ("heuristic
-判定讓使用者不信任"): nothing is asserted silently.
+---
 
-## Design direction
+### Design Direction
 
-Audience is engineers reviewing a structural diff, so the visual language is
-literal architectural blueprint — white linework on blueprint-blue paper,
-rather than the cream/serif, near-black/neon, or hairline-broadsheet defaults.
-The signature element is the dimension-line connector lane between the two
-trees: matched moved/renamed nodes get a drafting-style leader line with
-confidence-percentage labels, dashed when confidence is low. Tokens live in
-`src/styles/tokens.css`; per-type color/label/glyph metadata is centralized in
-`src/components/changeTypeMeta.ts` so no component re-decides a color.
+The audience is engineers reviewing a structural diff, so the visual language is
+a literal architectural **blueprint** — white linework on blueprint-blue paper.
+The signature element is the dimension-line connector lane between the two trees:
+matched moved/renamed nodes get a drafting-style leader line with confidence-
+percentage labels, dashed when confidence is low.
 
-## Known limitations / next steps
+---
 
-- **Matching is greedy, not globally optimal.** Pathological inputs (many
-  near-identical filenames) can produce a locally-good but globally
-  suboptimal assignment. Acceptable for MVP; a true min-cost bipartite match
-  is the natural upgrade if this becomes a problem in practice.
-- **No zip/git-snapshot input yet** (RPD input mode C) — would need a
-  small unzip + path-list extraction step, deliberately deferred to keep
-  the MVP backend-free per the RPD's technical preferences.
-- **No virtualization.** Trees rendering thousands of rows will be slow;
-  `react-window` or similar would slot into `components/TreeView` without
-  touching `core/`.
-- **Directory-level moved/renamed don't visually "absorb" their descendants
-  in the summary** — a moved folder produces one `moved` entry for the
-  folder and separate `unchanged` entries for everything inside it, since
-  diffing happens on the flat node list. This matches the RPD's literal
-  taxonomy but a future pass could roll up "folder X moved, N children
-  came with it" as a single summary line.
+### Privacy
+
+All diffing happens in your browser. No file content or diff result is ever sent
+to any server.
+
+---
+
+### For Developers & Contributors
+
+See [DEV_README.md](DEV_README.md) for the full architecture (layer boundaries,
+classification rules, the matching heuristic rationale) and extension points.
